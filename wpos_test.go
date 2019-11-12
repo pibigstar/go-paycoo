@@ -10,6 +10,7 @@ func TestWpos(t *testing.T) {
 	client := NewClient("fd5ecb65f8ac9a1c", privateKey, false)
 	param := &Push2cashier{
 		StoreNo:       "166131",
+		MerchantNo:    "10001171",
 		TerminalNo:    "888888888",
 		AcceptCashier: "CSP",
 		TransType:     "PURCHASE",

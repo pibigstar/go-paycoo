@@ -111,7 +111,8 @@ func (p *PayCoo) doRequest(params PayParam, result interface{}) error {
 	var data io.Reader
 	if params != nil {
 		values := p.encodeParams(params)
-		data = strings.NewReader(values.Encode())
+		body, _ := url.PathUnescape(values.Encode())
+		data = strings.NewReader(body)
 	}
 
 	req, err := http.NewRequest("POST", p.apiDomain, data)
