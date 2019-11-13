@@ -12,7 +12,7 @@ func TestWpos(t *testing.T) {
 		StoreNo:       "166131",
 		MerchantNo:    "10001171",
 		TerminalNo:    "888888888",
-		AcceptCashier: "CSP",
+		AcceptCashier: "WIP",
 		TransType:     "PURCHASE",
 		OutOrderNo:    "6666",
 		OrderAmount:   "1.20",

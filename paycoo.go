@@ -19,7 +19,6 @@ type PayCoo struct {
 	format       string // 仅支持JSON
 	charset      string // 仅支持UTF-8
 	signType     string // 仅支持RSA
-	Sing         string
 	version      string // 固定值 1.0
 	timestamp    time.Time
 	Client       *http.Client
@@ -80,15 +79,15 @@ func (p *PayCoo) encodeParams(param PayParam) url.Values {
 	values.Add("timestamp", p.timestamp.Format(TimeFormat))
 	values.Add("method", param.Method())
 
+	for key, value := range param.Params() {
+		values.Add(key, value)
+	}
+
 	sign, err := signWithRSA(values, p.privateKey)
 	if err != nil {
 		panic(err)
 	}
 	values.Add("sign", sign)
-
-	for key, value := range param.Params() {
-		values.Add(key, value)
-	}
 
 	return values
 }

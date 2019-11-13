@@ -41,8 +41,8 @@ type Push2cashier struct {
 	OrderAmount              string `json:"order_amount"`                         // M 支付金额
 	SpId                     string `json:"sp_id,omitempty"`                      // C 服务商ID
 	MerchantNo               string `json:"merchant_no,omitempty"`                // C 商户号
-	PaymentMethod            string `json:"payment_method,omitempty"`             // O 支付方式
 	OrigOutOrderNo           string `json:"orig_out_order_no,omitempty"`          // C 原商户订单号
+	PaymentMethod            string `json:"payment_method,omitempty"`             // O 支付方式
 	NotifyURL                string `json:"notify_url,omitempty"`                 // O 通知地址
 	Attach                   string `json:"attach,omitempty"`                     // O 附加信息
 	BizNo                    string `json:"biz_no,omitempty"`                     // O 业务标识号

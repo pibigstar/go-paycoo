@@ -1,7 +1,7 @@
 package paycoo
 
 const (
-	Format      = "json"
+	Format      = "JSON"
 	Version     = "1.0"
 	Charset     = "UTF-8"
 	SignType    = "RSA"
