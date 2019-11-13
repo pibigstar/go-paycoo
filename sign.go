@@ -10,20 +10,16 @@ import (
 	"strings"
 )
 
-func signWithPKCS1v15(param url.Values, privateKey *rsa.PrivateKey, hash crypto.Hash) (s string, err error) {
-	if param == nil {
-		param = make(url.Values, 0)
-	}
-
-	var pList = make([]string, 0, 0)
-	for key := range param {
-		var value = strings.TrimSpace(param.Get(key))
+func signWithPKCS1v15(values url.Values, privateKey *rsa.PrivateKey, hash crypto.Hash) (s string, err error) {
+	var params []string
+	for key := range values {
+		value := strings.TrimSpace(values.Get(key))
 		if len(value) > 0 {
-			pList = append(pList, key+"="+value)
+			params = append(params, key+"="+value)
 		}
 	}
-	sort.Strings(pList)
-	var src = strings.Join(pList, "&")
+	sort.Strings(params)
+	var src = strings.Join(params, "&")
 	sig, err := crypto4go.RSASignWithKey([]byte(src), privateKey, hash)
 	if err != nil {
 		return "", err

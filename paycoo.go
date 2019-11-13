@@ -72,8 +72,8 @@ func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
 	values.Add("charset", p.charset)
 	values.Add("sign_type", p.signType)
 	values.Add("version", p.version)
-	values.Add("timestamp", time.Now().Format(TimeFormat))
 	values.Add("method", param.Method())
+	values.Add("timestamp", time.Now().Format(TimeFormat))
 
 	for key, value := range param.Params() {
 		values.Add(key, value)
