@@ -7,10 +7,14 @@ var (
 )
 
 func TestWpos(t *testing.T) {
-	client := NewClient("fd5ecb65f8ac9a1c", privateKey, false)
+	client, err := NewClient("d040aeaf23a44dcd", privateKey, true)
+	if err != nil {
+		t.Error(err)
+	}
+
 	param := &Push2cashier{
-		StoreNo:       "166131",
-		MerchantNo:    "10001171",
+		StoreNo:       "166130",
+		MerchantNo:    "10030461",
 		TerminalNo:    "888888888",
 		AcceptCashier: "WIP",
 		TransType:     "PURCHASE",

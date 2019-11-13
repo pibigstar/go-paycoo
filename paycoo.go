@@ -2,9 +2,7 @@ package paycoo
 
 import (
 	"crypto"
-	"crypto/rand"
 	"crypto/rsa"
-	"encoding/base64"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -12,6 +10,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/smartwalle/crypto4go"
 )
 
 type PayCoo struct {
@@ -20,7 +20,7 @@ type PayCoo struct {
 	charset      string // 仅支持UTF-8
 	signType     string // 仅支持RSA
 	version      string // 固定值 1.0
-	timestamp    time.Time
+	timestamp    string
 	Client       *http.Client
 	apiDomain    string
 	isProduction bool
@@ -36,14 +36,13 @@ type Response struct {
 	Psn   string      `json:"psn"`
 }
 
-func NewClient(appId, privateKey string, isProduction bool) *PayCoo {
+func NewClient(appId, privateKey string, isProduction bool) (*PayCoo, error) {
 	client := &PayCoo{
 		appId:        appId,
 		format:       Format,
 		charset:      Charset,
 		signType:     SignType,
 		version:      Version,
-		timestamp:    time.Now(),
 		isProduction: isProduction,
 		Client:       http.DefaultClient,
 	}
@@ -52,66 +51,51 @@ func NewClient(appId, privateKey string, isProduction bool) *PayCoo {
 	if isProduction {
 		client.apiDomain = ProductionAPI
 	}
-	var (
-		key *rsa.PrivateKey
-		err error
-	)
-	key, err = ParsePKCS1PrivateKey(FormatPKCS1PrivateKey(privateKey))
+
+	key, err := crypto4go.ParsePKCS1PrivateKey(crypto4go.FormatPKCS1PrivateKey(privateKey))
 	if err != nil {
-		key, err = ParsePKCS8PrivateKey(FormatPKCS8PrivateKey(privateKey))
+		key, err = crypto4go.ParsePKCS8PrivateKey(crypto4go.FormatPKCS8PrivateKey(privateKey))
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
 	client.privateKey = key
 
-	return client
+	return client, nil
 }
 
-func (p *PayCoo) encodeParams(param PayParam) url.Values {
+func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
 	values := url.Values{}
 	values.Add("app_id", p.appId)
 	values.Add("format", p.format)
 	values.Add("charset", p.charset)
 	values.Add("sign_type", p.signType)
 	values.Add("version", p.version)
-	values.Add("timestamp", p.timestamp.Format(TimeFormat))
+	values.Add("timestamp", time.Now().Format(TimeFormat))
 	values.Add("method", param.Method())
 
 	for key, value := range param.Params() {
 		values.Add(key, value)
 	}
 
-	sign, err := signWithRSA(values, p.privateKey)
+	sign, err := signWithPKCS1v15(values, p.privateKey, crypto.SHA256)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	values.Add("sign", sign)
 
-	return values
-}
-
-func signWithRSA(values url.Values, privateKey *rsa.PrivateKey) (string, error) {
-	src := values.Encode()
-	var h = crypto.SHA256.New()
-	h.Write([]byte(src))
-	var hashed = h.Sum(nil)
-	sig, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed)
-	if err != nil {
-		return "", err
-	}
-
-	sign := base64.StdEncoding.EncodeToString(sig)
-	return sign, nil
+	return values, nil
 }
 
 func (p *PayCoo) doRequest(params PayParam, result interface{}) error {
 	var data io.Reader
 	if params != nil {
-		values := p.encodeParams(params)
-		body, _ := url.PathUnescape(values.Encode())
-		data = strings.NewReader(body)
+		values, err := p.encodeParams(params)
+		if err != nil {
+			return err
+		}
+		data = strings.NewReader(values.Encode())
 	}
 
 	req, err := http.NewRequest("POST", p.apiDomain, data)
