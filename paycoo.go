@@ -71,7 +71,11 @@ func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
 	values.Add("method", param.Method())
 	values.Add("timestamp", time.Now().Format(TimeFormat))
 
-	for key, value := range param.Params() {
+	m := make(map[string]string)
+	bs, _ := json.Marshal(param)
+	_ = json.Unmarshal(bs, &m)
+
+	for key, value := range m {
 		values.Add(key, value)
 	}
 
@@ -111,14 +115,26 @@ func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 	}
 	defer response.Body.Close()
 
-	bytes, err := ioutil.ReadAll(response.Body)
+	bs, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal(bytes, result)
+	err = json.Unmarshal(bs, result)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (p *PayCoo) AckNotification(w http.ResponseWriter) {
+	success := struct {
+		Code string `json:"code"`
+		Msg  string `json:"msg"`
+	}{
+		Code: "0",
+		Msg:  "SUCCESS",
+	}
+	data, _ := json.Marshal(success)
+	w.Write(data)
 }

@@ -17,6 +17,4 @@ const (
 type PayParam interface {
 	// API接口名
 	Method() string
-	// 额外参数列表
-	Params() map[string]string
 }
