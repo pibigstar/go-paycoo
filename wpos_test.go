@@ -13,8 +13,8 @@ func TestWpos(t *testing.T) {
 	}
 
 	param := &Push2cashier{
-		StoreNo:       "166130",
 		MerchantNo:    "10030461",
+		StoreNo:       "166130",
 		TerminalNo:    "888888888",
 		AcceptCashier: "WIP",
 		TransType:     "PURCHASE",

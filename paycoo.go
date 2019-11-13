@@ -1,6 +1,7 @@
 package paycoo
 
 import (
+	"bytes"
 	"crypto"
 	"crypto/rsa"
 	"encoding/json"
@@ -10,8 +11,6 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/smartwalle/crypto4go"
 )
 
 type PayCoo struct {
@@ -21,7 +20,6 @@ type PayCoo struct {
 	signType     string // 仅支持RSA
 	version      string // 固定值 1.0
 	timestamp    string
-	Client       *http.Client
 	apiDomain    string
 	isProduction bool
 	privateKey   *rsa.PrivateKey
@@ -44,7 +42,6 @@ func NewClient(appId, privateKey string, isProduction bool) (*PayCoo, error) {
 		signType:     SignType,
 		version:      Version,
 		isProduction: isProduction,
-		Client:       http.DefaultClient,
 	}
 
 	client.apiDomain = DevAPI
@@ -52,9 +49,9 @@ func NewClient(appId, privateKey string, isProduction bool) (*PayCoo, error) {
 		client.apiDomain = ProductionAPI
 	}
 
-	key, err := crypto4go.ParsePKCS1PrivateKey(crypto4go.FormatPKCS1PrivateKey(privateKey))
+	key, err := parsePKCS8PrivateKey(formatPKCS8PrivateKey(privateKey))
 	if err != nil {
-		key, err = crypto4go.ParsePKCS8PrivateKey(crypto4go.FormatPKCS8PrivateKey(privateKey))
+		key, err = parsePKCS1PrivateKey(formatPKCS1PrivateKey(privateKey))
 		if err != nil {
 			return nil, err
 		}
@@ -70,7 +67,6 @@ func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
 	values.Add("app_id", p.appId)
 	values.Add("format", p.format)
 	values.Add("charset", p.charset)
-	values.Add("sign_type", p.signType)
 	values.Add("version", p.version)
 	values.Add("method", param.Method())
 	values.Add("timestamp", time.Now().Format(TimeFormat))
@@ -79,33 +75,37 @@ func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
 		values.Add(key, value)
 	}
 
-	sign, err := signWithPKCS1v15(values, p.privateKey, crypto.SHA256)
+	sign, err := sha256WithRSA(values, p.privateKey, crypto.SHA256)
 	if err != nil {
 		return nil, err
 	}
 	values.Add("sign", sign)
 
+	// sign_type 不参与签名运算
+	values.Add("sign_type", p.signType)
+
 	return values, nil
 }
 
-func (p *PayCoo) doRequest(params PayParam, result interface{}) error {
+func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 	var data io.Reader
-	if params != nil {
-		values, err := p.encodeParams(params)
+	if param != nil {
+		values, err := p.encodeParams(param)
 		if err != nil {
 			return err
 		}
-		data = strings.NewReader(values.Encode())
+		var params = make(map[string]string, 0)
+		for key := range values {
+			value := strings.TrimSpace(values.Get(key))
+			if len(value) > 0 {
+				params[key] = values.Get(key)
+			}
+		}
+		bs, _ := json.Marshal(params)
+		data = bytes.NewReader(bs)
 	}
 
-	req, err := http.NewRequest("POST", p.apiDomain, data)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Content-Type", ContentType)
-
-	response, err := p.Client.Do(req)
+	response, err := http.Post(p.apiDomain, ContentType, data)
 	if err != nil {
 		return err
 	}

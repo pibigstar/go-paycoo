@@ -6,7 +6,7 @@ const (
 	Charset     = "UTF-8"
 	SignType    = "RSA"
 	TimeFormat  = "2006-01-02 15:04:05"
-	ContentType = "application/x-www-form-urlencoded;charset=utf-8"
+	ContentType = "application/json"
 )
 
 const (
