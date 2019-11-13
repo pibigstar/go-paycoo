@@ -84,12 +84,12 @@ func (*WebPay) Method() string {
 
 // 交易查询
 type OrderQuery struct {
-	StoreNo    string `json:"store_no"`                  // M 门店编号
-	TerminalNo string `json:"terminal_no"`               // M 推送的目标终端编号, 设备EN
-	OutOrderNo string `json:"out_order_no,omitempty"`    // C 商户订单编号
-	TransNo    string `json:"trans_no,omitempty"`        // C 交易号
-	SpId       string `json:"sp_id,omitempty,omitempty"` // C 服务商ID, 服务商模式时必须提供
-	MerchantNo string `json:"merchant_no,omitempty"`     // C 商户号, 商户模式时必须提供
+	StoreNo    string `json:"store_no"`               // M 门店编号
+	TerminalNo string `json:"terminal_no"`            // M 推送的目标终端编号, 设备EN
+	OutOrderNo string `json:"out_order_no,omitempty"` // C 商户订单编号
+	TransNo    string `json:"trans_no,omitempty"`     // C 交易号
+	SpId       string `json:"sp_id,omitempty"`        // C 服务商ID, 服务商模式时必须提供
+	MerchantNo string `json:"merchant_no,omitempty"`  // C 商户号, 商户模式时必须提供
 }
 
 func (*OrderQuery) Method() string {
