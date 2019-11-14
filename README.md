@@ -5,9 +5,9 @@
 https://www.yuque.com/paycoo/openapi
 
 ## Reminder
-- `M` : 必须
-- `C` : 二选一
-- `O` : 可选
+- `M` : 必填
+- `C` : 某些情况下必填
+- `O` : 可填
 
 ## Quick start
 ### Install

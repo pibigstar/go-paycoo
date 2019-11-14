@@ -65,3 +65,15 @@ func (p *PayCoo) PreAuthComp(param *PreAuthComp) (result *Response, err error) {
 	err = p.doRequest(param, &result)
 	return
 }
+
+// 提交商户资料进件, https://www.yuque.com/paycoo/openapi/api-merchant.apply
+func (p *PayCoo) PaperApply(param *PaperApply) (result *Response, err error) {
+	err = p.doRequest(param, &result)
+	return
+}
+
+// 商户资料补件, https://www.yuque.com/paycoo/openapi/api-merchant.modify
+func (p *PayCoo) PaperUpdate(param *PaperUpdate) (result *Response, err error) {
+	err = p.doRequest(param, &result)
+	return
+}

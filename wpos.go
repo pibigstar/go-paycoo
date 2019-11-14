@@ -23,6 +23,7 @@ type ExtensionParameters struct {
 	PaymentType      string `json:"payment_type,omitempty"`      // C 当payment_method不存在时生效, 扫码支付: QRCODE 刷卡支付: BANKCARD
 	AcceptTimeOut    string `json:"accept_time_out,omitempty"`   // C 终端受理时间与请求发起时间间隔不得超过请求受理超时时间，否则交易关闭。单位：秒
 	TransInstalments string `json:"trans_instalments,omitempty"` // M 花呗交易分期数，可选值:3,6,12
+	TransInstalment  string `json:"trans_instalment,omitempty"`  // O 是否支持分期, Y:支持, N:不支持
 }
 
 // 推送订单至WPOS
