@@ -83,3 +83,27 @@ func (p *PayCoo) DownloadBill(param *DownloadBill) (result *Response, err error)
 	err = p.doRequest(param, &result)
 	return
 }
+
+// 银联无感支付业务签约, https://www.yuque.com/paycoo/openapi/api-spbiz.senselesspay.contract.sign
+func (p *PayCoo) ContractSign(param *ContractSign) (result *Response, err error) {
+	err = p.doRequest(param, &result)
+	return
+}
+
+// 业务签约查询, https://www.yuque.com/paycoo/openapi/api-spbiz.senselesspay.contract.query
+func (p *PayCoo) ContractQuery(param *ContractQuery) (result *Response, err error) {
+	err = p.doRequest(param, &result)
+	return
+}
+
+// 业务解约, https://www.yuque.com/paycoo/openapi/api-spbiz.senselesspay.contract.terminate
+func (p *PayCoo) ContractTerminate(param *ContractTerminate) (result *Response, err error) {
+	err = p.doRequest(param, &result)
+	return
+}
+
+// 发起扣款, https://www.yuque.com/paycoo/openapi/api-spbiz.senselesspay.withhold
+func (p *PayCoo) Withhold(param *Withhold) (result *Response, err error) {
+	err = p.doRequest(param, &result)
+	return
+}

@@ -5,6 +5,7 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -71,12 +72,18 @@ func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
 	values.Add("method", param.Method())
 	values.Add("timestamp", time.Now().Format(TimeFormat))
 
-	m := make(map[string]string)
+	m := make(map[string]interface{})
 	bs, _ := json.Marshal(param)
 	_ = json.Unmarshal(bs, &m)
 
 	for key, value := range m {
-		values.Add(key, value)
+		switch value.(type) {
+		case string:
+			values.Set(key, value.(string))
+		default:
+			bs, _ := json.Marshal(value)
+			values.Set(key, string(bs))
+		}
 	}
 
 	sign, err := sha256WithRSA(values, p.privateKey, crypto.SHA256)
@@ -106,6 +113,7 @@ func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 			}
 		}
 		bs, _ := json.Marshal(params)
+		fmt.Println(string(bs))
 		data = bytes.NewReader(bs)
 	}
 
