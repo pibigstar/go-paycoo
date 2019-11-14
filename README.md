@@ -16,6 +16,7 @@ go get -u github.com/pibigstar/go-paycoo
 ```
 ### Demo
 ```go
+// 推送订单至WPOS
 func TestPush2cashier(t *testing.T) {
 	param := &Push2cashier{}
 	param.MerchantNo = "10030461"
@@ -25,7 +26,7 @@ func TestPush2cashier(t *testing.T) {
 	param.TransType = "PURCHASE"
 	param.OutOrderNo = "6666"
 	param.OrderAmount = "1.20"
-
+    
 	result, err := client.Push2cashier(param)
 	if err != nil {
 		t.Error(err)
