@@ -77,3 +77,9 @@ func (p *PayCoo) PaperUpdate(param *PaperUpdate) (result *Response, err error) {
 	err = p.doRequest(param, &result)
 	return
 }
+
+// 获取对账单, https://www.yuque.com/paycoo/openapi/api-accounting.downloadbill
+func (p *PayCoo) DownloadBill(param *DownloadBill) (result *Response, err error) {
+	err = p.doRequest(param, &result)
+	return
+}
