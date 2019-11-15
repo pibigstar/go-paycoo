@@ -27,6 +27,7 @@ const (
 
 var (
 	ErrPrivateKey = errors.New("private key have error")
+	ErrPublicKey  = errors.New("public key have error")
 )
 
 func signParams(values url.Values, privateKey *rsa.PrivateKey, hash crypto.Hash) (s string, err error) {
@@ -103,6 +104,30 @@ func formatPKCS8PrivateKey(raw string) []byte {
 	raw = strings.Replace(raw, kPKCS1Prefix, "", 1)
 	raw = strings.Replace(raw, KPKCS1Suffix, "", 1)
 	return formatKey(raw, kPKCS8Prefix, KPKCS8Suffix, 64)
+}
+
+func parsePublicKey(data []byte) (key *rsa.PublicKey, err error) {
+	var block *pem.Block
+	block, _ = pem.Decode(data)
+	if block == nil {
+		return nil, ErrPublicKey
+	}
+
+	var pubInterface interface{}
+	pubInterface, err = x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	key, ok := pubInterface.(*rsa.PublicKey)
+	if !ok {
+		return nil, ErrPublicKey
+	}
+
+	return key, err
+}
+
+func formatPublicKey(key string) []byte {
+	return formatKey(key, kPublicKeyPrefix, kPublicKeySuffix, 64)
 }
 
 func formatKey(raw, prefix, suffix string, lineCount int) []byte {

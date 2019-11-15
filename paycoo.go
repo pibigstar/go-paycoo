@@ -23,6 +23,7 @@ type PayCoo struct {
 	apiDomain    string
 	isProduction bool
 	privateKey   *rsa.PrivateKey
+	publicKey    *rsa.PublicKey
 }
 
 type Response struct {
@@ -34,7 +35,7 @@ type Response struct {
 	Psn   string      `json:"psn"`
 }
 
-func NewClient(appId, privateKey string, isProduction bool) (*PayCoo, error) {
+func NewClient(appId, privateKey, publicKey string, isProduction bool) (*PayCoo, error) {
 	client := &PayCoo{
 		appId:        appId,
 		format:       Format,
@@ -56,8 +57,13 @@ func NewClient(appId, privateKey string, isProduction bool) (*PayCoo, error) {
 			return nil, err
 		}
 	}
-
 	client.privateKey = key
+
+	pubKey, err := parsePublicKey(formatPublicKey(publicKey))
+	if err != nil {
+		return nil, err
+	}
+	client.publicKey = pubKey
 
 	return client, nil
 }
