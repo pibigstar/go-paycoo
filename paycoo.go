@@ -5,7 +5,6 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -86,7 +85,7 @@ func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
 		}
 	}
 
-	sign, err := sha256WithRSA(values, p.privateKey, crypto.SHA256)
+	sign, err := signParams(values, p.privateKey, crypto.SHA256)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +112,6 @@ func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 			}
 		}
 		bs, _ := json.Marshal(params)
-		fmt.Println(string(bs))
 		data = bytes.NewReader(bs)
 	}
 
@@ -132,6 +130,28 @@ func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	var resp Response
+	err = json.Unmarshal(bs, &resp)
+	if err != nil {
+		return err
+	}
+
+	// TODO: 验签
+	//if resp.Code != "0" {
+	//	return RequestError
+	//}
+	//
+	//if resp.Sign != "" {
+	//	bs, _ := json.Marshal(resp.Data)
+	//	sign, err := sha256WithRsaWithBase64(bs, p.privateKey, crypto.SHA256)
+	//	if err != nil {
+	//		return SignError
+	//	}
+	//	if sign != resp.Sign {
+	//		return SignError
+	//	}
+	//}
 	return nil
 }
 

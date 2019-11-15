@@ -1,5 +1,7 @@
 package paycoo
 
+import "errors"
+
 const (
 	Format      = "JSON"
 	Version     = "1.0"
@@ -12,6 +14,11 @@ const (
 const (
 	DevAPI        = "http://open.wangtest.cn/api/gateway"
 	ProductionAPI = "https://open.wangpos.com/api/gateway"
+)
+
+var (
+	RequestError = errors.New("request interface failed")
+	SignError    = errors.New("verify sign failed")
 )
 
 type PayParam interface {

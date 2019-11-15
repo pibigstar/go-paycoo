@@ -29,7 +29,7 @@ var (
 	ErrPrivateKey = errors.New("private key have error")
 )
 
-func sha256WithRSA(values url.Values, privateKey *rsa.PrivateKey, hash crypto.Hash) (s string, err error) {
+func signParams(values url.Values, privateKey *rsa.PrivateKey, hash crypto.Hash) (s string, err error) {
 	var params []string
 	for key := range values {
 		value := strings.TrimSpace(values.Get(key))
@@ -39,7 +39,11 @@ func sha256WithRSA(values url.Values, privateKey *rsa.PrivateKey, hash crypto.Ha
 	}
 	sort.Strings(params)
 	var src = strings.Join(params, "&")
-	sig, err := signRSAWithKey([]byte(src), privateKey, hash)
+	return sha256WithRsaWithBase64([]byte(src), privateKey, hash)
+}
+
+func sha256WithRsaWithBase64(bs []byte, privateKey *rsa.PrivateKey, hash crypto.Hash) (s string, err error) {
+	sig, err := sha256WithRsa(bs, privateKey, hash)
 	if err != nil {
 		return "", err
 	}
@@ -47,7 +51,7 @@ func sha256WithRSA(values url.Values, privateKey *rsa.PrivateKey, hash crypto.Ha
 	return s, nil
 }
 
-func signRSAWithKey(src []byte, key *rsa.PrivateKey, hash crypto.Hash) ([]byte, error) {
+func sha256WithRsa(src []byte, key *rsa.PrivateKey, hash crypto.Hash) ([]byte, error) {
 	var h = hash.New()
 	h.Write(src)
 	var hashed = h.Sum(nil)
