@@ -2,7 +2,6 @@ package paycoo
 
 import (
 	"bytes"
-	"crypto"
 	"crypto/rsa"
 	"encoding/json"
 	"io"
@@ -50,16 +49,13 @@ func NewClient(appId, privateKey, publicKey string, isProduction bool) (*PayCoo,
 		client.apiDomain = ProductionAPI
 	}
 
-	key, err := parsePKCS8PrivateKey(formatPKCS8PrivateKey(privateKey))
+	key, err := ParsePrivateKey(privateKey)
 	if err != nil {
-		key, err = parsePKCS1PrivateKey(formatPKCS1PrivateKey(privateKey))
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 	client.privateKey = key
 
-	pubKey, err := parsePublicKey(formatPublicKey(publicKey))
+	pubKey, err := ParsePublicKey(publicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -68,12 +64,13 @@ func NewClient(appId, privateKey, publicKey string, isProduction bool) (*PayCoo,
 	return client, nil
 }
 
-func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
+func (p *PayCoo) encodeParams(param PayParam) (url.Values, string, error) {
 	values := url.Values{}
 	values.Add("app_id", p.appId)
 	values.Add("format", p.format)
 	values.Add("charset", p.charset)
 	values.Add("version", p.version)
+	values.Add("sign_type", p.signType)
 	values.Add("method", param.Method())
 	values.Add("timestamp", time.Now().Format(TimeFormat))
 
@@ -91,22 +88,22 @@ func (p *PayCoo) encodeParams(param PayParam) (url.Values, error) {
 		}
 	}
 
-	sign, err := signParams(values, p.privateKey, crypto.SHA256)
+	sign, src, err := signParams(values, p.privateKey)
 	if err != nil {
-		return nil, err
+		return nil, src, err
 	}
 	values.Add("sign", sign)
 
-	// sign_type 不参与签名运算
-	values.Add("sign_type", p.signType)
-
-	return values, nil
+	return values, src, nil
 }
 
 func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
-	var data io.Reader
+	var (
+		data io.Reader
+	)
+
 	if param != nil {
-		values, err := p.encodeParams(param)
+		values, _, err := p.encodeParams(param)
 		if err != nil {
 			return err
 		}
@@ -150,11 +147,10 @@ func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 	//
 	//if resp.Sign != "" {
 	//	bs, _ := json.Marshal(resp.Data)
-	//	sign, err := sha256WithRsaWithBase64(bs, p.privateKey, crypto.SHA256)
+	//	fmt.Println(string(bs))
+	//	err := RSAVerifyWithKey(bs, []byte(resp.Sign), p.publicKey, crypto.SHA256)
 	//	if err != nil {
-	//		return SignError
-	//	}
-	//	if sign != resp.Sign {
+	//		fmt.Println(err.Error())
 	//		return SignError
 	//	}
 	//}
