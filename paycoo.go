@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rsa"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -141,19 +142,26 @@ func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 	}
 
 	// TODO: 验签
-	//if resp.Code != "0" {
-	//	return RequestError
-	//}
-	//
-	//if resp.Sign != "" {
-	//	bs, _ := json.Marshal(resp.Data)
-	//	fmt.Println(string(bs))
-	//	err := RSAVerifyWithKey(bs, []byte(resp.Sign), p.publicKey, crypto.SHA256)
-	//	if err != nil {
-	//		fmt.Println(err.Error())
-	//		return SignError
-	//	}
-	//}
+	if resp.Sign != "" {
+		values := url.Values{}
+		values.Add("code", resp.Code)
+		values.Add("msg", resp.Msg)
+		values.Add("total", fmt.Sprintf("%d", resp.Total))
+		values.Add("psn", resp.Psn)
+
+		m := make([]map[string]string, 0)
+		bs, _ := json.Marshal(resp.Data)
+		_ = json.Unmarshal(bs, &m)
+		dataStr, _ := json.Marshal(m)
+
+		values.Add("data", string(dataStr))
+		src := ParseValues(values)
+		fmt.Println(src)
+		err = VerifySignWithKey([]byte(src), resp.Sign, p.publicKey)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
 	return nil
 }
 

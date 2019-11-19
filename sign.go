@@ -31,6 +31,12 @@ var (
 )
 
 func signParams(values url.Values, privateKey *rsa.PrivateKey) (string, string, error) {
+	src := ParseValues(values)
+	sign, err := sha256WithRsaWithBase64([]byte(src), privateKey)
+	return sign, src, err
+}
+
+func ParseValues(values url.Values) string {
 	var params []string
 	for key := range values {
 		if !inWhiteList(key) {
@@ -41,9 +47,7 @@ func signParams(values url.Values, privateKey *rsa.PrivateKey) (string, string, 
 		}
 	}
 	sort.Strings(params)
-	var src = strings.Join(params, "&")
-	sign, err := sha256WithRsaWithBase64([]byte(src), privateKey)
-	return sign, src, err
+	return strings.Join(params, "&")
 }
 
 // sign_type和trans_no不参与签名
@@ -267,6 +271,23 @@ func RSAVerifyWithKey(src, sign []byte, key *rsa.PublicKey, hash crypto.Hash) er
 	h.Write(src)
 	var hashed = h.Sum(nil)
 	return rsa.VerifyPKCS1v15(key, hash, hashed, sign)
+}
+
+func VerifySign(src []byte, sign, publicKey string) error {
+	key, err := ParsePublicKey(publicKey)
+	if err != nil {
+		return err
+	}
+
+	return VerifySignWithKey(src, sign, key)
+}
+
+func VerifySignWithKey(src []byte, sign string, key *rsa.PublicKey) error {
+	bs, err := base64.StdEncoding.DecodeString(sign)
+	if err != nil {
+		return err
+	}
+	return RSAVerifyWithKey(src, bs, key, crypto.SHA256)
 }
 
 func formatKey(raw, prefix, suffix string, lineCount int) []byte {
