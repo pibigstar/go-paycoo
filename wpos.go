@@ -29,11 +29,9 @@ type ExtensionParameters struct {
 // 推送订单至WPOS
 type Push2cashier struct {
 	WPOSParams
-	BizNo                    string              `json:"biz_no,omitempty"`                     // O 业务标识号
-	IgnoreSupervisorPassword string              `json:"ignore_supervisor_password,omitempty"` // O 忽略主管密码检验
-	Description              string              `json:"description,omitempty"`                // O 商户订单的描述信息
-	ExtensionParameters      ExtensionParameters `json:"extension_parameters,omitempty"`       // O 扩展参数
-
+	BizNo                    string `json:"biz_no,omitempty"`                     // O 业务标识号
+	IgnoreSupervisorPassword string `json:"ignore_supervisor_password,omitempty"` // O 忽略主管密码检验
+	Description              string `json:"description,omitempty"`                // O 商户订单的描述信息
 }
 
 func (*Push2cashier) Method() string {

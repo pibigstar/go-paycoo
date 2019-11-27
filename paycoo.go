@@ -156,7 +156,6 @@ func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 
 		values.Add("data", string(dataStr))
 		src := ParseValues(values)
-		fmt.Println(src)
 		err = VerifySignWithKey([]byte(src), resp.Sign, p.publicKey)
 		if err != nil {
 			fmt.Println(err.Error())
