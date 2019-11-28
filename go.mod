@@ -1,4 +1,4 @@
-module paycoo
+module github/pibigstar/go-paycoo
 
 go 1.13
 
