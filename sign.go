@@ -52,10 +52,7 @@ func ParseValues(values url.Values) string {
 
 // sign_type和trans_no不参与签名
 func inWhiteList(key string) bool {
-	if key == "sign_type" {
-		return true
-	}
-	if key == "trans_no" {
+	if key == "sign_type" || key == "trans_no" || key == "sign" {
 		return true
 	}
 	return false

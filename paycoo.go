@@ -177,31 +177,66 @@ func (p *PayCoo) AckNotification(w http.ResponseWriter) {
 }
 
 type Notification struct {
-	Status       string     `json:"status"`
-	AnalysisMode string     `json:"analysis_mode"`
-	ResultData   ResultData `json:"result_data"`
-	Attach       string     `json:"attach"`
-}
-
-type ResultData struct {
-	QRStr     string `json:"qr_str"`
-	Title     string `json:"title"`
-	TitleType int    `json:"title_type"`
-	Phone     string `json:"phone"`
-	TaxNo     string `json:"tax_no"`
-	Addr      string `json:"addr"`
-	BankType  string `json:"bank_type"`
-	BankNo    string `json:"bank_no"`
+	AppId              string `json:"app_id"`
+	Format             string `json:"format"`
+	Charset            string `json:"charset"`
+	SignType           string `json:"sign_type"`
+	Sign               string `json:"sign"`
+	Version            string `json:"version"`
+	Timestamp          string `json:"timestamp"`
+	SpId               string `json:"sp_id,omitempty"`                 // C 服务商ID
+	MerchantNo         string `json:"merchant_no,omitempty"`           // C 商户号
+	StoreNo            string `json:"store_no,omitempty"`              // M 门店编号
+	TerminalNo         string `json:"terminal_no,omitempty"`           // M 推送的目标终端编号, 设备EN
+	TransNo            string `json:"trans_no,omitempty"`              // M 交易号
+	OutOrderNo         string `json:"out_order_no,omitempty"`          // M 商户订单编号
+	PayPlatformTransNo string `json:"pay_platform_trans_no,omitempty"` // 支付平台交易号
+	TransStatus        string `json:"trans_status,omitempty"`          // M 交易类型
+	PaymentMethod      string `json:"payment_method,omitempty"`        // O 支付方式
+	TransType          string `json:"trans_type,omitempty"`            // M 交易类型
+	PayUserAccountId   string `json:"pay_user_account_id,omitempty"`   // M 卖家账号标识
+	TransCurrency      string `json:"trans_currency,omitempty"`        // O 标价币种
+	ExchangeRate       string `json:"exchange_rate,omitempty"`         // O 汇率
+	TransAmount        string `json:"trans_amount,omitempty"`          // M 交易金额
+	CustomerPaidAmount string `json:"customer_paid_amount,omitempty"`  // M 顾客实付金额
+	DiscountBmopc      string `json:"discount_bmopc,omitempty"`        // O 支付通道商户优惠金额
+	DiscountBpc        string `json:"discount_bpc,omitempty"`          // O 支付通道优惠金额
+	TransEndTime       string `json:"trans_end_time,omitempty"`        // M 交易完成时间
+	Attach             string `json:"attach,omitempty,omitempty"`      // O 附加信息
+	CardAttr           string `json:"card_attr,omitempty"`             // O 卡属性
 }
 
 func (p *PayCoo) GetNotification(req *http.Request) (*Notification, error) {
 	result := &Notification{}
-	result.Status = req.FormValue("status")
-	result.AnalysisMode = req.FormValue("analysis_mode")
-	var resultData ResultData
 
-	json.Unmarshal([]byte(req.FormValue("result_data")), &resultData)
-	result.ResultData = resultData
+	result.AppId = req.FormValue("app_id")
+	result.Format = req.FormValue("format")
+	result.Charset = req.FormValue("charset")
+	result.SignType = req.FormValue("sign_type")
+	result.Sign = req.FormValue("sign")
+	result.Version = req.FormValue("version")
+	result.Timestamp = req.FormValue("timestamp")
+
+	result.SpId = req.FormValue("sp_id")
+	result.MerchantNo = req.FormValue("merchant_no")
+	result.StoreNo = req.FormValue("store_no")
+	result.TerminalNo = req.FormValue("terminal_no")
+	result.TransNo = req.FormValue("trans_no")
+	result.OutOrderNo = req.FormValue("out_order_no")
+	result.PayPlatformTransNo = req.FormValue("pay_platform_trans_no")
+	result.TransStatus = req.FormValue("trans_status")
+	result.PaymentMethod = req.FormValue("payment_method")
+	result.TransType = req.FormValue("trans_type")
+	result.PayUserAccountId = req.FormValue("pay_user_account_id")
+	result.TransCurrency = req.FormValue("trans_currency")
+	result.ExchangeRate = req.FormValue("exchange_rate")
+	result.TransAmount = req.FormValue("trans_amount")
+	result.CustomerPaidAmount = req.FormValue("customer_paid_amount")
+	result.DiscountBmopc = req.FormValue("discount_bmopc")
+	result.DiscountBpc = req.FormValue("discount_bpc")
+	result.TransEndTime = req.FormValue("trans_end_time")
+	result.Attach = req.FormValue("attach")
+	result.CardAttr = req.FormValue("card_attr")
 	result.Attach = req.FormValue("attach")
 
 	//TODO: 校验参数
