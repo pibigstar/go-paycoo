@@ -8,7 +8,7 @@ import (
 
 func TestPush2cashier(t *testing.T) {
 	param := &Push2cashier{}
-	param.StoreNo = "362261"
+	param.StoreNo = "166130"
 	param.TerminalNo = "8888888"
 	param.AcceptCashier = "CSP"
 	param.TransType = "PURCHASE"

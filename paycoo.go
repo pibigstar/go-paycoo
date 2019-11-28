@@ -175,3 +175,38 @@ func (p *PayCoo) AckNotification(w http.ResponseWriter) {
 	data, _ := json.Marshal(success)
 	w.Write(data)
 }
+
+type Notification struct {
+	Status       string     `json:"status"`
+	AnalysisMode string     `json:"analysis_mode"`
+	ResultData   ResultData `json:"result_data"`
+	Attach       string     `json:"attach"`
+}
+
+type ResultData struct {
+	QRStr     string `json:"qr_str"`
+	Title     string `json:"title"`
+	TitleType int    `json:"title_type"`
+	Phone     string `json:"phone"`
+	TaxNo     string `json:"tax_no"`
+	Addr      string `json:"addr"`
+	BankType  string `json:"bank_type"`
+	BankNo    string `json:"bank_no"`
+}
+
+func (p *PayCoo) GetNotification(req *http.Request) (*Notification, error) {
+	result := &Notification{}
+	result.Status = req.FormValue("status")
+	result.AnalysisMode = req.FormValue("analysis_mode")
+	var resultData ResultData
+
+	json.Unmarshal([]byte(req.FormValue("result_data")), &resultData)
+	result.ResultData = resultData
+	result.Attach = req.FormValue("attach")
+
+	//TODO: 校验参数
+	src := ParseValues(req.Form)
+	err := VerifySignWithKey([]byte(src), req.FormValue("sign"), p.publicKey)
+
+	return result, err
+}
