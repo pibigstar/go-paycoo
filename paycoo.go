@@ -206,7 +206,7 @@ type Notification struct {
 	CardAttr           string `json:"card_attr,omitempty"`             // O 卡属性
 }
 
-func GetNotification(req *http.Request) (*Notification, error) {
+func (p *PayCoo) GetNotification(req *http.Request) (*Notification, error) {
 	var result Notification
 	err := json.NewDecoder(req.Body).Decode(&result)
 	return &result, err
