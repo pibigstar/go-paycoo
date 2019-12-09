@@ -206,42 +206,8 @@ type Notification struct {
 	CardAttr           string `json:"card_attr,omitempty"`             // O 卡属性
 }
 
-func (p *PayCoo) GetNotification(req *http.Request) (*Notification, error) {
-	result := &Notification{}
-
-	result.AppId = req.FormValue("app_id")
-	result.Format = req.FormValue("format")
-	result.Charset = req.FormValue("charset")
-	result.SignType = req.FormValue("sign_type")
-	result.Sign = req.FormValue("sign")
-	result.Version = req.FormValue("version")
-	result.Timestamp = req.FormValue("timestamp")
-
-	result.SpId = req.FormValue("sp_id")
-	result.MerchantNo = req.FormValue("merchant_no")
-	result.StoreNo = req.FormValue("store_no")
-	result.TerminalNo = req.FormValue("terminal_no")
-	result.TransNo = req.FormValue("trans_no")
-	result.OutOrderNo = req.FormValue("out_order_no")
-	result.PayPlatformTransNo = req.FormValue("pay_platform_trans_no")
-	result.TransStatus = req.FormValue("trans_status")
-	result.PaymentMethod = req.FormValue("payment_method")
-	result.TransType = req.FormValue("trans_type")
-	result.PayUserAccountId = req.FormValue("pay_user_account_id")
-	result.TransCurrency = req.FormValue("trans_currency")
-	result.ExchangeRate = req.FormValue("exchange_rate")
-	result.TransAmount = req.FormValue("trans_amount")
-	result.CustomerPaidAmount = req.FormValue("customer_paid_amount")
-	result.DiscountBmopc = req.FormValue("discount_bmopc")
-	result.DiscountBpc = req.FormValue("discount_bpc")
-	result.TransEndTime = req.FormValue("trans_end_time")
-	result.Attach = req.FormValue("attach")
-	result.CardAttr = req.FormValue("card_attr")
-	result.Attach = req.FormValue("attach")
-
-	//TODO: 校验参数
-	src := ParseValues(req.Form)
-	err := VerifySignWithKey([]byte(src), req.FormValue("sign"), p.publicKey)
-
-	return result, err
+func GetNotification(req *http.Request) (*Notification, error) {
+	var result Notification
+	err := json.NewDecoder(req.Body).Decode(&result)
+	return &result, err
 }
