@@ -1,27 +1,27 @@
 package paycoo
 
 type WPOSParams struct {
-	StoreNo        string `json:"store_no"`                    // M 门店编号
-	TerminalNo     string `json:"terminal_no"`                 // M 推送的目标终端编号, 设备EN
-	AcceptCashier  string `json:"accept_cashier"`              // M 指定处理的收银类APP, WIP、CSP、TFWIP
-	TransType      string `json:"trans_type"`                  // M 交易类型
-	OutOrderNo     string `json:"out_order_no"`                // M 商户订单编号
-	OrderAmount    string `json:"order_amount"`                // M 支付金额
-	SpId           string `json:"sp_id,omitempty"`             // C 服务商ID
-	MerchantNo     string `json:"merchant_no,omitempty"`       // C 商户号
-	OrigOutOrderNo string `json:"orig_out_order_no,omitempty"` // C 原商户订单号
-	PaymentMethod  string `json:"payment_method,omitempty"`    // O 支付方式
-	NotifyURL      string `json:"notify_url,omitempty"`        // O 通知地址
-	Attach         string `json:"attach,omitempty"`            // O 附加信息
-	PushMessage    string `json:"push_message,omitempty"`      // O 推送消息的内容
-	VoiceMessage   string `json:"voice_message,omitempty"`     // O 语音播报内容
-
+	StoreNo             string              `json:"store_no"`                       // M 门店编号
+	TerminalNo          string              `json:"terminal_no"`                    // M 推送的目标终端编号, 设备EN
+	AcceptCashier       string              `json:"accept_cashier"`                 // M 指定处理的收银类APP, WIP、CSP、TFWIP
+	TransType           string              `json:"trans_type"`                     // M 交易类型
+	OutOrderNo          string              `json:"out_order_no"`                   // M 商户订单编号
+	OrderAmount         string              `json:"order_amount"`                   // M 支付金额
+	SpId                string              `json:"sp_id,omitempty"`                // C 服务商ID
+	MerchantNo          string              `json:"merchant_no,omitempty"`          // C 商户号
+	OrigOutOrderNo      string              `json:"orig_out_order_no,omitempty"`    // C 原商户订单号
+	PaymentMethod       string              `json:"payment_method,omitempty"`       // O 支付方式
+	NotifyURL           string              `json:"notify_url,omitempty"`           // O 通知地址
+	Attach              string              `json:"attach,omitempty"`               // O 附加信息
+	PushMessage         string              `json:"push_message,omitempty"`         // O 推送消息的内容
+	VoiceMessage        string              `json:"voice_message,omitempty"`        // O 语音播报内容
+	ExtensionParameters ExtensionParameters `json:"extension_parameters,omitempty"` // O 额外参数
 }
 
 // 扩展参数
 type ExtensionParameters struct {
 	PaymentType      string `json:"payment_type,omitempty"`      // C 当payment_method不存在时生效, 扫码支付: QRCODE 刷卡支付: BANKCARD
-	AcceptTimeOut    string `json:"accept_time_out,omitempty"`   // C 终端受理时间与请求发起时间间隔不得超过请求受理超时时间，否则交易关闭。单位：秒
+	AcceptTimeOut    int    `json:"accept_time_out,omitempty"`   // C 终端受理时间与请求发起时间间隔不得超过请求受理超时时间，否则交易关闭。单位：秒
 	TransInstalments string `json:"trans_instalments,omitempty"` // M 花呗交易分期数，可选值:3,6,12
 	TransInstalment  string `json:"trans_instalment,omitempty"`  // O 是否支持分期, Y:支持, N:不支持
 }
