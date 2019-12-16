@@ -141,7 +141,6 @@ func (p *PayCoo) doRequest(param PayParam, result interface{}) error {
 		return err
 	}
 
-	// TODO: 验签
 	if resp.Sign != "" {
 		values := url.Values{}
 		values.Add("code", resp.Code)
@@ -174,6 +173,7 @@ func (p *PayCoo) AckNotification(w http.ResponseWriter) {
 	}
 	data, _ := json.Marshal(success)
 	w.Write(data)
+	w.WriteHeader(http.StatusOK)
 }
 
 type Notification struct {
@@ -207,7 +207,27 @@ type Notification struct {
 }
 
 func (p *PayCoo) GetNotification(req *http.Request) (*Notification, error) {
-	var result Notification
+	result := &Notification{}
 	err := json.NewDecoder(req.Body).Decode(&result)
-	return &result, err
+	// 验签
+	var resultMap map[string]string
+	_ = json.NewDecoder(req.Body).Decode(&resultMap)
+	str := buildSignStr(resultMap)
+
+	err = VerifySignWithKey([]byte(str), result.Sign, p.publicKey)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
+}
+
+func buildSignStr(resultMap map[string]string) string {
+	urls := url.Values{}
+	for key, value := range resultMap {
+		if value == "" {
+			continue
+		}
+		urls.Add(key, value)
+	}
+	return ParseValues(urls)
 }

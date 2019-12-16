@@ -20,15 +20,14 @@ func TestRsaSign(t *testing.T) {
 		t.Error(err)
 	}
 	t.Log(sign)
-}
 
-func TestVerifyAppSign(t *testing.T) {
-	err := VerifySign([]byte(src), sign, appPublicKey)
+	err = VerifySign([]byte(src), sign, appPublicKey)
 	if err != nil {
 		t.Error(err)
 	} else {
 		t.Log("verify success!")
 	}
+
 }
 
 func TestVerifySign(t *testing.T) {
