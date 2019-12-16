@@ -209,11 +209,16 @@ type Notification struct {
 func (p *PayCoo) GetNotification(req *http.Request) (*Notification, error) {
 	result := &Notification{}
 	err := json.NewDecoder(req.Body).Decode(&result)
-	// 验签
-	var resultMap map[string]string
-	_ = json.NewDecoder(req.Body).Decode(&resultMap)
-	str := buildSignStr(resultMap)
+	if err != nil {
+		return result, err
+	}
 
+	bs, _ := json.Marshal(result)
+	var resultMap map[string]string
+	_ = json.Unmarshal(bs, &resultMap)
+
+	str := buildSignStr(resultMap)
+	// 验签
 	err = VerifySignWithKey([]byte(str), result.Sign, p.publicKey)
 	if err != nil {
 		return result, err
